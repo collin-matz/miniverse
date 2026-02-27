@@ -1,4 +1,4 @@
-pub mod barnesHutTree;
-pub mod types;
+pub mod barnes_hut_tree;
 pub mod body;
 pub mod constants;
+pub mod quadrant;
