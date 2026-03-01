@@ -19,7 +19,7 @@ const HALF_H: f64 = HEIGHT as f64 * SCALE * 0.5;
 const DIMENSIONS: (DVec2, DVec2) = (DVec2::new(-HALF_W, -HALF_H), DVec2::new( HALF_W,  HALF_H));
 
 const SCALE: f64 = 7.48e9;
-const DT: f64 = 60000.0;
+const DT: f64 = 120000.0;
 const THETA: f64 = 0.5;
 
 const TITLE: &str = "Miniverse";

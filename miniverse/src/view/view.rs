@@ -1,6 +1,6 @@
-use minifb::{Key, Window, WindowOptions};
+use minifb::{Key, Window, WindowOptions, MouseButton, MouseMode};
 use crate::{
-    controller::{controller_body::ControllerBody, controller::Controller}, 
+    controller::{controller_body::{ControllerBody, ControllerBodyBuilder}, controller::Controller}, 
     model::barnes_hut_tree::HasPositionAndMassTrait
 };
 
@@ -37,6 +37,25 @@ impl<'v> ViewLoop<'v> {
     /// Starts the main ViewLoop.
     pub fn start(&mut self) {
         while self.window.is_open() && !self.window.is_key_down(Key::Escape) {
+
+            if self.window.get_mouse_down(MouseButton::Left) {
+                if let Some((x, y)) = self.window.get_mouse_pos(MouseMode::Clamp) {
+
+                    let position = self.pixel_to_world(x, y);
+
+                    println!("{:?}", position);
+
+                    let cb = ControllerBodyBuilder::new()
+                        .mass(1e30)
+                        .position_from_point(position.0, position.1)
+                        .build();
+
+                    self.controller.add_body(cb);
+                }
+
+                
+            }
+
             // Clear the pixel_queue_buffer
             self.clear_pixel_queue_buffer();
 
@@ -80,7 +99,7 @@ impl<'v> ViewLoop<'v> {
         self.pixel_queue_buffer = vec![None; self.width * self.height];
     }
 
-    /// Convert a Body pixel to the world pixel.
+    /// Convert a world pixel to a screen pixel.
     fn world_to_pixel(&self, x: f64, y: f64) -> Option<(i32, i32)> {
         let px = (x / self.scale + self.width as f64 / 2.0) as isize;
         let py = (y / self.scale + self.height as f64 / 2.0) as isize;
@@ -92,6 +111,13 @@ impl<'v> ViewLoop<'v> {
         } else {
             None
         }
+    }
+
+    /// Convert a screen pixel to a world pixel.
+    pub fn pixel_to_world(&self, px: f32, py: f32) -> (f64, f64) {
+        let world_x = (px as f64 - self.width as f64 / 2.0) * self.scale;
+        let world_y = (py as f64 - self.height as f64 / 2.0) * self.scale;
+        (world_x as f64, world_y as f64)
     }
 
     fn draw_filled_circle(&mut self, cx: i32, cy: i32, radius: u32, color: u32) {
