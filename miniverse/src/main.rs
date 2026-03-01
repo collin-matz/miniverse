@@ -25,35 +25,7 @@ const THETA: f64 = 0.5;
 const TITLE: &str = "Miniverse";
 
 fn main() {
-    // Create bodies.
-    // let mut bodies = vec![
-    //     // Sun
-    //     ControllerBodyBuilder::new()
-    //         .position_from_point(0.0, 0.0)
-    //         .mass(1.989e30)
-    //         .velocity_from_point(0.0, 0.0)
-    //         .color(0xFFFF00)
-    //         .radius(10)
-    //         .build(),
-    //     // Earth
-    //     ControllerBodyBuilder::new()
-    //         .position_from_point(1.496e11, 0.0)
-    //         .mass(5.972e24)
-    //         .velocity_from_point(0.0, 29780.0)
-    //         .color(0x0000FF)
-    //         .radius(2)
-    //         .build(),
-    //     // Mars
-    //     ControllerBodyBuilder::new()
-    //         .position_from_point(2.279e11, 0.0)
-    //         .mass(6.39e23)
-    //         .velocity_from_point(0.0, 24100.0)
-    //         .color(0xFF0000)
-    //         .radius(2)
-    //         .build(),
-    // ];
-
-    let mut bodies = vec![
+    let bodies = vec![
         // Sun
         ControllerBodyBuilder::new()
             .position_from_point(0.0, 0.0)
