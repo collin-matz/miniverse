@@ -86,22 +86,23 @@ pub mod functions {
         direction * force
     }
 
+    pub fn update_position<B: Body2DTrait>(body: &mut B, dt: f64) {
+        let new_pos = body.position() + body.velocity() * dt + 0.5 * body.acceleration() * dt * dt;
+        body.set_position(new_pos);
+    }
+
     /// Given a 2D force vector, apply that force to the Body.
     /// This updates its acceleration and velocity vectors.
     pub fn apply_force_to_body<B: Body2DTrait>(body: &mut B, force: DVec2, dt: f64) {
-        // 1. Update position using current velocity and acceleration
-        let position = body.position() + (body.velocity() * dt + 0.5 * body.acceleration() * dt * dt);
-        body.set_position(position);
-
-        // 2. Save old acceleration / compute new acceleration
+        // 1. Save old acceleration / compute new acceleration
         let old_acc = body.acceleration();
         let new_acc = force / body.mass();
 
-        // 3. Average the old and new velocities and update velocity
+        // 2. Average the old and new velocities and update velocity
         let velocity = body.velocity() + 0.5 * (old_acc + new_acc) * dt;
         body.set_velocity(velocity);
 
-        // 4. Set the new acceleration
+        // 3. Set the new acceleration
         body.set_acceleration(new_acc);
     }
 }
