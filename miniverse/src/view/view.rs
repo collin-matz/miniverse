@@ -1,23 +1,19 @@
-use glam::DVec2;
 use minifb::{Key, Window, WindowOptions};
-use crate::{controller::controller::Controller};
+use crate::{
+    controller::{controller_body::ControllerBody, controller::Controller}, 
+    model::barnes_hut_tree::HasPositionAndMassTrait
+};
 
-pub struct ViewBody {
-    pub body_position: DVec2,
-    pub color: u32,
-    pub radius: i32,
-    pub z_index: u32
-}
 
 /// Structure for managing information regarding the ViewLoop
 pub struct ViewLoop<'v> {
-    controller: &'v mut Controller,     // An immutable reference to the controller.
+    controller: &'v mut Controller,             // An immutable reference to the controller.
     main_buffer: Vec<u32>,
     pixel_queue_buffer: Vec<Option<u32>>,       // Stores the pixel to be rendered on the next pass.
     window: Window,
     width: usize,
     height: usize,
-    scale: f64,                         // Scales the pixel values to work with Universe distances.
+    scale: f64,                                 // Scales the pixel values to work with Universe distances.
     universe_background_color: u32,
     planet_default_color: u32
 }
@@ -45,20 +41,19 @@ impl<'v> ViewLoop<'v> {
             self.clear_pixel_queue_buffer();
 
             // Get the next set of Body positions for rendering.
-            let view_body_list = self.controller.update_bodies_and_get_positions();
+            let controller_body_list: Vec<ControllerBody> = self.controller.update_bodies_and_get_positions().iter().cloned().collect();
 
-            for view_body in view_body_list.iter() {
+            for controller_body in controller_body_list.iter() {
 
                 // Convert the physical position of the body to a pixel position.
                 let position = self.world_to_pixel(
-                    view_body.body_position.x, view_body.body_position.y
+                    controller_body.body.position().x, controller_body.body.position().y
                 );
 
 
                 if let Some((px, py)) = position {
                     // Color in the circle that the Body takes up
-                    // self.draw_filled_circle(px, py, view_body.radius, view_body.color);
-                    self.pixel_queue_buffer[py as usize * self.width + px as usize] = Some(view_body.color);
+                    self.draw_filled_circle(px, py, controller_body.radius, controller_body.color);
                 }
             }
 
@@ -99,7 +94,8 @@ impl<'v> ViewLoop<'v> {
         }
     }
 
-    fn draw_filled_circle(&mut self, cx: i32, cy: i32, radius: i32, color: u32) {
+    fn draw_filled_circle(&mut self, cx: i32, cy: i32, radius: u32, color: u32) {
+        let radius = radius as i32;
         let r2 = radius * radius;
 
         for dy in -radius..=radius {

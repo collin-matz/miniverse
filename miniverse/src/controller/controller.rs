@@ -1,23 +1,12 @@
-use std::cell::RefCell;
+use std::cell::{Ref, RefCell};
 use glam::DVec2;
 
 use crate::{
     model::{
-        barnes_hut_tree::{BHTree, HasPositionAndMassTrait}, body::{Body, functions}
+        barnes_hut_tree::BHTree, body::{Body, functions}
     },
-    view::view::ViewBody
+    controller::controller_body::ControllerBody
 };
-
-/// A wrapper for the Body struct.
-/// This wrapper allows the controller to know more information about the
-/// body without needing to inject this information into the model (things
-/// like color and radius that are important for the View).
-struct ControllerBody {
-    pub body: Body,
-    pub color: u32,
-    pub radius: i32,
-    pub z_index: u32
-}
 
 /// Structure for managing the Controller.
 pub struct Controller {
@@ -34,24 +23,20 @@ impl Controller {
     }
 
     /// Adds a new Body to the Controller's list of Bodies.
-    pub fn add_body(&mut self, body: Body, color: u32, radius: i32, z_index: u32) {
-        // Since we always push a Body to the back of the list, we will
-        let controller_body = ControllerBody {
-            body, color, radius, z_index
-        };
+    pub fn add_body(&mut self, controller_body: ControllerBody) {
         self.controller_bodies.borrow_mut().push(controller_body);
     }
 
-    pub fn add_all_bodies(&mut self, body_list: Vec<Body>) {
-        for body in body_list {
-            self.add_body(body, 0xFFFFFFFF, 10, 1);
+    pub fn add_all_bodies(&mut self, controller_body_list: Vec<ControllerBody>) {
+        for body in controller_body_list {
+            self.add_body(body);
         }
     }
 
     /// Returns a ViewBody list for rendering to the screen.
-    pub fn update_bodies_and_get_positions(&self) -> Vec<ViewBody> {
+    pub fn update_bodies_and_get_positions(&self) -> Ref<Vec<ControllerBody>> {
         self.step();
-        self.create_view_body_list()
+        self.controller_bodies.borrow()
     }
 
     /// Steps the model by the specified dt.
@@ -81,22 +66,5 @@ impl Controller {
         for (i, body) in self.controller_bodies.borrow_mut().iter_mut().enumerate() {
             functions::apply_force_to_body(&mut body.body, forces[i], self.dt);
         };
-    }
-
-    /// Using the ControllerBody list, create a new list of
-    /// ViewBodies to send to the View.
-    fn create_view_body_list(&self) -> Vec<ViewBody> {
-        let mut view_body_list: Vec<ViewBody> = vec![];
-
-        for controller_body in self.controller_bodies.borrow().iter() {
-            view_body_list.push(ViewBody {
-                body_position: controller_body.body.position(),
-                color: controller_body.color,
-                radius: controller_body.radius,
-                z_index: controller_body.z_index
-            })
-        }
-
-        view_body_list
     }
 }
