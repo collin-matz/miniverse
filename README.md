@@ -1,3 +1,3 @@
 # Miniverse
 
-![demo](miniverse.mp4)
+![miniverse-video](https://github.com/collin-matz/miniverse/raw/main/miniverse.mp4)
